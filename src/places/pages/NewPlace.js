@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer } from 'react';
+import React from 'react';
 
 import Input from '../../shared/FormElements/Input';
 import Button from '../../shared/components/UIElements/Button';
@@ -6,62 +6,33 @@ import {
   VALIDATOR_REQUIRE,
   VALIDATOR_MINLENGTH
 } from '../../shared/util/validators';
+import {useForm} from "../../shared/hooks/form-hook";
 import './NewPlace.css';
 
-const formReducer = (state, action) => {
-  switch (action.type) {
-    case 'INPUT_CHANGE':
-      let formIsValid = true;
-      for (const inputId in state.inputs) {  {/** InputId is (title of each input from inputhander dispatch) (for) is checking every IputId */}
-        if (inputId === action.inputId) { {/** matching for titles */}
-          formIsValid = formIsValid && action.isValid;
-        } else {
-          formIsValid = formIsValid && state.inputs[inputId].isValid;
-        }
-      }
-      return {
-        ...state,
-        inputs: {
-          ...state.inputs,
-          [action.inputId]: { value: action.value, isValid: action.isValid }
-        },
-        isValid: formIsValid
-      };
-    default:
-      return state;
-  }
-};
 
 
 
 const NewPlace = () => {
-  const [formState, dispatch] = useReducer(formReducer, {
-    inputs: {
-      title: {
-        value: '',
-        isValid: false
-      },
-      description: {
-        value: '',
-        isValid: false
-      },
-      address: {
-        value: '',
-        isValid: false
-      }
+ {/**sendig paramets of title in useFrom(fnction or customState) that what we need to use here for every update and createplace title are differernt */}
+ {/** from useForm hooks we are distracturing/getting  formState & inputHandler */}
+  const [formState,inputHandler ]=useForm({
+    title: {
+      value: '',
+      isValid: false
     },
-    isValid: false
-  });
+    description: {
+      value: '',
+      isValid: false
+    },  
+    address: {
+      value: '',
+      isValid: false
+    }
+  },false)
 
-  const inputHandler = useCallback((id, value, isValid) => {
-    dispatch({
-      type: 'INPUT_CHANGE',
-      value: value,
-      isValid: isValid,
-      inputId: id
-    });
-  }, []);
+ 
 
+  {/** submiting form to server */}
   const placeSubmitHandler = event =>{
     event.preventDefault();
     console.log(formState.inputs);
