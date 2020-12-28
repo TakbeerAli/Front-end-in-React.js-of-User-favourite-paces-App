@@ -4,6 +4,7 @@ import PlaceList from "../components/PlaceList";
 
 
 
+
 const DUMMY_PLACES =[
     {
         id:'p1',
@@ -29,18 +30,7 @@ const DUMMY_PLACES =[
         },
         creator:'u2'
     },
-    {
-        id:'p3',
-        title:'Empire of kurlus usaman',
-        description:'this is the place of ghazi usman',
-        imageUrl:'https://picsum.photos/200/300',
-        address:'Turkey,02,istabul',
-        coordinate:{
-            lat:41.0082 ,
-            lng:28.9784
-        },
-        creator:'u2'
-    },
+  
 
 ]
 
