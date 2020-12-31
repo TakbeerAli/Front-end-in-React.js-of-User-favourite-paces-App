@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -15,32 +15,67 @@ import NewPlace from './places/pages/NewPlace';
 import UserList from './user/components/UsersList';
 import Auth from './user/pages/Auth';
 import UpdatePlace from "../src/places/pages/UpdatePlace";
+import { AuthContext } from './shared/context/auth-context';
 
 const App = () => {
-  return (
-    <Router>
-    <MainNavigation />
-    <main>
-      <Switch>
-        <Route path="/" exact>
-          <Users />
-        </Route>
-        <Route path="/:userId/places" exact>
-        <UserPlace/>
-        </Route>
-        <Route path="/places/new" exact>
+  {/*usestate insure wheater user is loggedin or not*/}
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  {/*This is for Authentication procces*/}
+  const login = useCallback(()=>{
+    setIsLoggedIn(true);
+  },[]);
+
+  const logout = useCallback(()=>{
+    setIsLoggedIn(false);
+  },[]);
+
+  {/*This logic is for when user isLoged in or notloggedin show specific links buttons*/}
+  let routes;
+  if (isLoggedIn){
+    routes = (
+      <switch>
+      <Route path="/" exact>
+        <Users />
+      </Route>
+      <Route path="/:userId/places" exact>
+       <UserPlace/>
+       </Route>
+       <Route path="/places/new" exact>
           <NewPlace />
         </Route>
         <Route path="/places/:placeId">
             <UpdatePlace/>
         </Route>
-        <Route path="/auth">
-                 <Auth />
-        </Route>
         <Redirect to="/" />
-      </Switch>
-      </main>
+      </switch>
+
+    );
+  }else{
+    routes = (
+      <switch>
+      <Route path="/" exact>
+        <Users />
+      </Route>
+      <Route path="/:userId/places" exact>
+       <UserPlace/>
+       </Route>
+       <Route path="/auth">
+           <Auth />
+        </Route>
+        <Redirect to="/auth" />
+      </switch>
+      
+    
+    );
+  }
+
+  return (
+    <AuthContext.Provider value={{isLoggedIn:isLoggedIn, login:login,logout:logout }}>
+    <Router>
+    <MainNavigation />
+    <main>{routes}</main>
     </Router>
+    </AuthContext.Provider>
   );
 };
 

@@ -5,7 +5,10 @@ const formReducer = (state, action) => {
     case 'INPUT_CHANGE':
       let formIsValid = true;
       for (const inputId in state.inputs) {     {/** InputId is (title of each input from inputhander dispatch) (for) is checking every IputId */}
-        if (inputId === action.inputId) {   {/** matching for titles */}
+       if(!state.inputs[inputId]){     {/*this is for switching btw login & siginup*/}
+         continue;
+       }
+      if (inputId === action.inputId) {   {/** matching for titles */}
           formIsValid = formIsValid && action.isValid;
         } else {
           formIsValid = formIsValid && state.inputs[inputId].isValid;
