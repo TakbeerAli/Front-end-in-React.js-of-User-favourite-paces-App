@@ -33,7 +33,7 @@ const App = () => {
   let routes;
   if (isLoggedIn){
     routes = (
-      <switch>
+      <Switch>
       <Route path="/" exact>
         <Users />
       </Route>
@@ -47,12 +47,12 @@ const App = () => {
             <UpdatePlace/>
         </Route>
         <Redirect to="/" />
-      </switch>
+      </Switch>
 
     );
   }else{
     routes = (
-      <switch>
+      <Switch>
       <Route path="/" exact>
         <Users />
       </Route>
@@ -63,7 +63,7 @@ const App = () => {
            <Auth />
         </Route>
         <Redirect to="/auth" />
-      </switch>
+      </Switch>
       
     
     );

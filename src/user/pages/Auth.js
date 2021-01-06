@@ -50,9 +50,33 @@ const Auth = () =>{
 
     };
 
-    const authSubmitHandler =event =>{
+    const authSubmitHandler = async event =>{
         event.preventDefault();
-        console.log(formState.inputs);
+
+        if(isLoginMode){
+
+        }else{ 
+        {/* This is sending data from front-end to backend method*/}
+
+            try {
+              const response = await fetch('http://localhost:5000/api/users/singup',{
+                method: 'POST',
+                headers: {
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({
+                    name:formState.inputs.name.value,
+                    email:formState.inputs.email.value,
+                    password:formState.inputs.password.value
+                })
+        });
+        const responseData = await response.json();
+        console.log(responseData);
+            } catch (err) {
+                  console.log(err);
+            }
+        }
+          
         auth.login();
     };
 
