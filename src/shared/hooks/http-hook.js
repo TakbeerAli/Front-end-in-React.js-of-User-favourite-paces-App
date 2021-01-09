@@ -6,7 +6,7 @@ export const  useHttpClient = () => {
  const [error, setError] = useState();
 
  // this is for cuting http request
- const activeHttpRequests =  ([]);
+ const activeHttpRequests =  useRef([]);
 
  const sendRequest = useCallback( async (url, method = 'GET', body = null, headers = {} ) => {
     setIsLoading(true);
@@ -29,30 +29,33 @@ export const  useHttpClient = () => {
         if(!response.ok){
           throw new Error(responseData.message);
         }
-        
+
+        setIsLoading(false);
         return responseData;
 
     } catch (err) {
-      setError(err.message);        
+      setError(err.message);
+      setIsLoading(false);
+      throw err;        
     }
-    setIsLoading(false);
+    
 
  },[]);
 
  // this send error msg if there is any eror 
  const clearError = () =>{
      setError(null);
+
  };
+
 
 // check for if the request is finished
  useEffect(() => {
     return () => {
-        activeHttpRequests.current.forEach(abortctrl => abortctrl.abortctrl());
+        activeHttpRequests.current.forEach(abortCtrl => abortCtrl.abort());
     };
-
-
  },[])
 
- return { isLoading, error, sendRequest, clear, clearError };
+ return { isLoading, error, sendRequest, clearError };
 
 };

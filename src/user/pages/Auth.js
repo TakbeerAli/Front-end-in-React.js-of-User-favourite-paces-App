@@ -4,6 +4,7 @@ import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/UIElements/Button";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import { useHttpClient } from '../../shared/hooks/http-hook';
 
 import { VALIDATOR_EMAIL,VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from "../../shared/util/validators";
 import { useForm }from "../../shared/hooks/form-hook";
@@ -18,8 +19,10 @@ const Auth = () =>{
      const auth = useContext(AuthContext); {/* concept is not cleared */}
 
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [isLoading, setIsLoading ] = useState(false);
-    const [ error, setError ] = useState();
+   
+    const { isLoading, error, sendRequest, clearError } = useHttpClient(); // geting values form the http hooks
+
+
     const [formState, inputHandler,setFormData] = useForm({
         email:{
             value:'',
@@ -59,78 +62,59 @@ const Auth = () =>{
 
     const authSubmitHandler = async event =>{
         event.preventDefault();
-        setIsLoading(true);
-        if(isLoginMode){
-             
-            try {
-               
-                const response = await fetch('http://localhost:5000/api/users/login',{
-                  method: 'POST',
-                  headers: {
-                      'Content-Type':'application/json'
-                  },
-                  body:JSON.stringify({
-                      email:formState.inputs.email.value,
-                      password:formState.inputs.password.value
-                  })
-          });
-               const responseData = await response.json();
-               if (!response.ok){
-                  throw new Error(responseData.message);  {/* if there is 404 error or form data same then stop auth and show code */}
-               }
-  
-                console.log(responseData);
-                 setIsLoading(false); {/* when data is loded then turn off loader */}
-                  auth.login(); {/* when data is correct then show the dashbord */}
-              } catch (err) {
-                    
-                    setIsLoading(false); // when content is loded then don't show loading msg
-                    setError(err.message || 'Something went wrong, please try again. '); {/*if there is any error show msg*/} 
-              }
+        
 
 
+
+        if(isLoginMode){      
+          try { 
+            await sendRequest(
+                'http://localhost:5000/api/users/login',
+                'POST', 
+                 JSON.stringify({
+                  email:formState.inputs.email.value,
+                  password:formState.inputs.password.value
+            }),
+             {
+                 'Content-Type':'application/json'
+              }        
+             ); 
+              auth.login(); {/* when data is correct then show the dashbord */}    
+          } catch (err) {
+              // can't do any thing in error block it show error by it self
+          }
         }else{ 
-        {/* This is sending data from front-end to backend*/}
 
-            try {
-               
-              const response = await fetch('http://localhost:5000/api/users/singup',{
-                method: 'POST',
-                headers: {
+            try { 
+               await sendRequest(
+                   'http://localhost:5000/api/users/singup', 
+                    'POST',JSON.stringify({
+                     name:formState.inputs.name.value,
+                     email:formState.inputs.email.value,
+                     password:formState.inputs.password.value
+            }),
+                {
                     'Content-Type':'application/json'
                 },
-                body:JSON.stringify({
-                    name:formState.inputs.name.value,
-                    email:formState.inputs.email.value,
-                    password:formState.inputs.password.value
-                })
-        });
-             const responseData = await response.json();
-             if (!response.ok){
-                throw new Error(responseData.message);  {/* if there is 404 error or form data same then stop auth and show code */}
-             }
-
-              console.log(responseData);
-               setIsLoading(false); {/* when data is loded then turn off loader */}
+                
+            );
                 auth.login(); {/* when data is correct then show the dashbord */}
             } catch (err) {
                   
-                  setIsLoading(false); // when content is loded then don't show loading msg
-                  setError(err.message || 'Something went wrong, please try again. '); {/*if there is any error show msg*/} 
             }
         }
         
     };
 
-    {/*this is for to pass error to error null mean remove */}
-    const  errorHandler = () => {
-        setError(null);
-    };
+    // {/*this is for to pass error to error null mean remove */}
+    // const  errorHandler = () => {
+    //     clearError();
+    // };
       
 
  return (
  <React.Fragment>
-  <ErrorModal  error={error} onClear={errorHandler} />
+  <ErrorModal  error={error} onClear={clearError} />
  <Card className="authentication">
  {isLoading && <LoadingSpinner asOverlay />}
  <h2>Login Form</h2>
